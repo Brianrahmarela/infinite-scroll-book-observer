@@ -5,6 +5,7 @@ export default function useBookSearch(query, pageNumber) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [books, setBooks] = useState([]);
+	const [numFound, setNumFound] = useState(null);
 	console.log("books", books);
 	console.log("state books length", books.length);
 
@@ -26,12 +27,12 @@ export default function useBookSearch(query, pageNumber) {
 			method: "GET",
 			url: "http://openlibrary.org/search.json",
 			params: { q: query, page: pageNumber },
-			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+			cancelToken: new axios.CancelToken((c) => (cancel = c))
 		})
 			.then((res) => {
 				setBooks((prevBooks) => {
 					return [
-						...new Set([...prevBooks, ...res.data.docs.map((b) => b.title)]),
+						...new Set([...prevBooks, ...res.data.docs.map((b) => b.title)])
 					];
 				});
 				console.log("res", res);
@@ -39,6 +40,7 @@ export default function useBookSearch(query, pageNumber) {
 
 				setHasMore(res.data.docs.length > 0);
 				setLengthBooks(res.data.docs.length);
+				setNumFound(res.data.q !== "" ? res.data.numFound : null);
 				setLoading(false);
 			})
 			.catch((err) => {
@@ -48,5 +50,5 @@ export default function useBookSearch(query, pageNumber) {
 		return () => cancel();
 	}, [query, pageNumber]);
 
-	return { loading, error, books, hasMore };
+	return { loading, error, books, hasMore, numFound };
 }

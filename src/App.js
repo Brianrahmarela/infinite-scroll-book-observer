@@ -7,8 +7,13 @@ function App() {
 	const [query, setQuery] = useState("");
 	const [pageNumber, setPageNumber] = useState(1);
 	console.log("pageNumber", pageNumber);
-	const { books, hasMore, loading, error } = useBookSearch(query, pageNumber);
+	const { books, hasMore, loading, error, numFound } = useBookSearch(
+		query,
+		pageNumber
+	);
 	console.log("books di app js", books);
+	console.log("numFound di app js", numFound);
+	console.log("books.length", books.length);
 
 	const observer = useRef();
 	console.log("observer", observer);
@@ -24,7 +29,7 @@ function App() {
 			});
 			//check jika last element ada
 			if (node) observer.current.observe(node);
-			console.log("node lastbook", node);
+			// console.log("node lastbook", node);
 		},
 		[loading, hasMore]
 	);
@@ -38,29 +43,84 @@ function App() {
 			style={{
 				display: "flex",
 				alignItems: "center",
-				// justifyContent: "center",
-				height: "100vh",
 				flexDirection: "column",
-				marginTop: "100px",
-				backgroundColor: "white",
+				margin: "100px 20px 20px 20px",
 				padding: "20px",
+				backgroundColor: "white",
+
+				borderRadius: "20px"
 			}}
+			className="shadow"
 		>
-			<input type="text" value={query} onChange={handleSearch}></input>
-			{books.map((book, index) => {
-				//check last books element
-				if (books.length === index + 1) {
-					return (
-						<div ref={lastBookElementRef} key={book}>
-							{book}
-						</div>
-					);
-				} else {
-					return <div key={book}>{book}</div>;
-				}
-			})}
-			<div>{loading && "Loading..."}</div>
-			<div>{error && "Error"}</div>
+			<label style={{ fontWeight: "bold", fontSize: "22px" }}>
+				Search Books
+			</label>
+			<input
+				type="text"
+				value={query}
+				onChange={handleSearch}
+				placeholder="Search books here.."
+				style={{ margin: "20px 0 20px 0", padding: "7px 14px 7px 14px" }}
+			></input>
+			<div
+				style={{
+					display: `${books.length === 0 ? "none" : "flex"}`,
+					justifyContent: "center",
+					width: "100%",
+					gap: "10px",
+					flexWrap: "wrap",
+					marginTop: "100px",
+					// backgroundColor: "green",
+					margin: "20px"
+				}}
+			>
+				{books.map((book, index) => {
+					//check last books element
+					if (books.length === index + 1) {
+						return (
+							<div
+								style={{
+									backgroundColor: "red",
+									color: "white",
+									padding: "10px",
+									marginBottom: "5px",
+									borderRadius: "10px"
+								}}
+								ref={lastBookElementRef}
+								key={book}
+							>
+								{book}
+							</div>
+						);
+					} else {
+						return (
+							<div
+								style={{
+									backgroundColor: "#efefef",
+									padding: "10px",
+									marginBottom: "5px",
+									borderRadius: "10px"
+								}}
+								ref={lastBookElementRef}
+								key={book}
+							>
+								{book}s
+							</div>
+						);
+					}
+				})}
+			</div>
+			<div
+				style={{
+					backgroundColor: "black",
+					color: "white"
+					// boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
+				}}
+			>
+				{loading && "Loading..."}
+			</div>
+			{numFound === 0 && !loading ? <div>Books not found</div> : ""}
+			{/* <div>{error && "Error"}</div> */}
 		</div>
 	);
 }
